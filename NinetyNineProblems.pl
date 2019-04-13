@@ -142,7 +142,108 @@ range(I, K, X) :- I1 is I + 1, range(I1, K, X1), append([I], X1, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % P23: Create a randomly generated list of the specified size
-rnd_select([], _, []).
-rnd_select(_, 0, []) :- !.
-rnd_select(L, N, X) :- length(L, Len), Len1 is Len + 1, random(1, Len1, K), element_at(E, L, K), N1 is N - 1, rnd_select(L, N1, X1), append([E], X1, X).
+rnd_selectList([], _, []).
+rnd_selectList(_, 0, []) :- !.
+rnd_selectList(L, N, X) :- length(L, Len), Len1 is Len + 1, random(1, Len1, K), element_at(E, L, K), remove_at(L, K, L1), N1 is N - 1, rnd_selectList(L1, N1, X1), !, append([E], X1, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P24: Lotto: Select N numbers in the range 1..M
+rnd_selectRange(N, M, []) :- N > M.
+rnd_selectRange(0, _, []) :- !.
+rnd_selectRange(N, M, X) :- N1 is N - 1, rnd_selectRange(N1, M, X1), M1 is M + 1, random(1, M1, E), append([E], X1, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P25: Generate a random permutation
+rnd_permu([], []).
+rnd_permu(L, X) :- length(L, Len), rnd_selectList(L, Len, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P26: Generate all possible combinations
+combination(0, _, []) :- !.
+combination(K, [A | L], X) :- K1 is K - 1, combination(K1, L, X1), append([A], X1, X).
+combination(K, [_ | L], X) :- combination(K, L, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P27: 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P28: 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P31: Check if the given number is prime
+is_prime(2) :- !.
+is_prime(N) :- N > 2, N mod 2 =\= 0, divisors(N, L), L == [1, N].
+% Find the divisors a given element.
+divisors(N, L) :- divisorsHelper(N, N, L).
+divisorsHelper(N, 1, [1]) :- !, N > 0.
+divisorsHelper(N, X, L) :- N mod X =:= 0 -> X1 is X - 1, divisorsHelper(N, X1, L1), append(L1, [X], L) ; X1 is X - 1, divisorsHelper(N, X1, L).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P32: Greatest common divisor
+% arithmetic_function(gcd/2).
+gcd(X, 0, X) :- !. 
+gcd(X, X, X) :- !.
+gcd(X, Y, Z) :- X > Y -> X1 is X mod Y, gcd(Y, X1, Z) ; gcd(Y, X, Z).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P33: Coprime numbers
+% coprime(X, Y) :- Z is gcd(X, Y), Z =:= 1.
+coprime(X, Y) :- gcd(X, Y, Z), Z =:= 1.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P34: Euler's Phi function
+totient_phi(1, 1).
+totient_phi(N, X) :- is_prime(N), X is N - 1, !.
+totient_phi(N, X) :- totient_phiHelper(N, 1, X).
+totient_phiHelper(N, N, 0) :- !.
+totient_phiHelper(N, K, X) :- coprime(N, K) -> K1 is K + 1, totient_phiHelper(N, K1, X1), X is X1 + 1 ; K1 is K + 1, totient_phiHelper(N, K1, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P35: List of prime factors
+prime_factors(N, []) :- N =:= 0 ; N =:= 1, !.
+prime_factors(N, [N]) :- is_prime(N), !.
+prime_factors(N, L) :- prime_factorsHelper(N, L, 2).
+prime_factorsHelper(N, [], N).
+prime_factorsHelper(N, L, K) :- is_prime(K), N mod K =:= 0 -> N1 is N / K, prime_factors(N1, L1), append([K], L1, L) ; K1 is K + 1, prime_factorsHelper(N, L, K1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P36: List of prime factors with multiplicity
+prime_factors_mult(N, L) :- prime_factors(N, L1), encode(L1, L2), prime_factors_multHelper(L2, L).
+prime_factors_multHelper([], []).
+prime_factors_multHelper([A | L], L1) :- swap(A, A1), prime_factors_multHelper(L, L2), append([A1], L2, L1).
+swap([A, E], [E, A]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P37: Euler's Phi function (improved version)
+phi(N, X) :- prime_factors_mult(N, L), phiHelper(X, L).
+phiHelper(1, []) :- !.
+phiHelper(N, [[A,E] | L]) :- phiHelper(N1, L), N is N1 * (A - 1) * (A ** (E - 1)).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P39: A list of prime numbers in a given range
+prime_range(I, K, []) :- I > K, !.
+prime_range(I, I, [I]) :- is_prime(I), !.
+prime_range(I, K, L) :- is_prime(I) -> I1 is I + 1, prime_range(I1, K, L1), append([I], L1, L) ; I1 is I + 1, prime_range(I1, K, L).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P40: Goldbach's conjecture
+goldbach(N, []) :- (N < 3 ; N mod 2 =\= 0), !.
+goldbach(N, L) :- goldbachHelper(N, L, 2).
+goldbachHelper(N, L, E) :- (K is N - E, is_prime(E), is_prime(K)) -> L = [E, K] ; E1 is E + 1, goldbachHelper(N, L, E1).  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P41: List of Goldbach's pair in a given range
+goldbach_list(I, K, []) :- I > K, !.
+goldbach_list(I, I, [L]) :- goldbach(I, L1), append([I], L1, L), !.
+goldbach_list(I, K, L) :- I > 2, I mod 2 =:= 0 -> I1 is I + 2, goldbach_list(I1, K, L1), !, goldbach(I, L2), append([I], L2, L3), append([L3], L1, L) ; I1 is I + 1, goldbach_list(I1, K, L), !.
+
+% Goldbach list with a lower bound on one of the primes
+goldbach_list(I, K, J, _) :- I > K ; J > K, !.
+goldbach_list(I, K, J, L) :- goldbach_list(I, K, L1), goldbach_filter(L1, J, L).
+goldbach_filter([], _, []).
+goldbach_filter([[N, A, B] | L1], J, L) :- (A >= J, B >= J) -> goldbach_filter(L1, J, L2), append([[N, A, B]], L2, L) ; goldbach_filter(L1, J, L). 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P46: Logical expressions (Version 1.0)
+
 
