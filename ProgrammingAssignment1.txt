@@ -1,0 +1,121 @@
+Programming Assignment 1
+
+Start each file with comments stating your name, roll number, and state clearly in your own words that you have written all the code on your own and have not done any cheating. 
+
+
+Prolog
+P1
+Write all code in a single file named p1.pl
+
+You can use built-in predicates like length, member, not and ==, \==, >= etc.
+
+
+A multiset allows elements to occur more than once. For example, the multiset M = {2, 1, 2, 3, 3, 1, 2} has 3 distinct elements 1, 2, 3 occuring 2, 3, 2 times respectively. 
+
+Write the following predicates
+
+(sample output shown).
+
+
+
+1. crdnlty(M, N) which means N is the number of distinct elements in multiset M.
+
+?- crdnlty([3,1,2,3],N). gives N = 3 .
+
+
+
+2. crdnltyHigh(M, K, N) means there are N distinct elements in multiset M that occur K or more times.
+
+?- crdnltyHigh([3,1,2,3], 4, N). gives N = 0 .
+
+?- crdnltyHigh([3,1,2,3,1,1,1,1,1], 4, N). gives N = 1 .
+
+
+
+3. crdnltyMax(M,N1,N2) means there are N1 distinct elements in the multiset M occurring the maximum N2 times.
+
+?- crdnltyMax([4,2,4,4,3,3], N1,N2) gives N1 = 1, N2 = 3. since 4 occurs the maximum number of times, i.e. 3 times and only 1 number, i.e. 4 occurs 3 times.
+
+
+File to be submitted: p1.pl
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ASP
+
+P2
+
+Given n and diff, count the number of pairs of prime numbers in the range 1 to n (n is included) with difference diff. Count only unique pairs so (x,y) and (y,x) would be the same pair.
+
+Sample Output
+$ clingo -c n=100 -c diff=10  p2.lp
+
+Solving...
+
+Answer: 1
+ans(10) pair(3,13) pair(7,17) pair(13,23) pair(19,29) pair(31,41) pair(37,47) pair(43,53) pair(61,71) pair(73,83) pair(79,89)
+SATISFIABLE
+
+
+You don't have to show individual pairs, just show the final count, i.e in this case 10.
+
+File to be submitted: p2.lp
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+P3
+
+You have to identify markings for a Golomb Ruler given the number of markings m and maximum difference n. (For more details, refer to    https://en.wikipedia.org/wiki/Golomb_ruler)
+
+Sample outputs:
+
+$ clingo -c n=6 -c m=4  p3.lp%
+
+
+Answer: 1
+
+used(0) used(2) used(5) used(6)
+
+SATISFIABLE
+
+
+
+Some other (n,m) values for which Golomb rulers exist are (17,6) and (25,7). You can use these values to test your code. Note that we will check your code against more exhaustive testcases.
+
+Please note that if there are multiple answers possible (as in the above example), it is okay if your code outputs just 1 correct answer. It is not necessary to find all the possible markings.
+
+A skeleton code is provided to you. Make necessary additions to the following code and submit it as p3.lp :
+
+
+
+% p3.lp  to check if we can make m marks on a ruler of length n.
+
+order(m). % number of marks to make is m.
+
+pos(0..n). % length of ruler is n. n+1 markable positions 0..n
+
+used(0).  % first mark is at 0.
+
+{used(N)} :- pos(N). % mark some subset of positions.
+
+:- not m = #count{N:used(N)}.  % use only models with exactly m marks.
+
+%% add your code here ....
+
+
+
+%% do not change anything below this line
+
+#show used/1.
+
+File to be submitted: p3.lp
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+SUBMISSION INSTRUCTIONS :
+You have to submit a tar file with the name la0_<your roll number> (for e.g. if your roll number is la0_17005001, you should submit la0_170050001.tar.gz). The tar file should contain the following directory structure:
+la0_<your roll number>
+      |_ p1.pl
+      |_ p2.lp
+      |_ p3.lp
+
