@@ -3,7 +3,7 @@
 %% Roll Number: 170050031
 %% Date:		April 14, 2019
 %% I, hereby, declare that this assignment is my own work and has not been copied from any other person's work (published or unpublished).
-%% I have not provided (intentionally or otherwise) this assignment to anyone who can potentially use it as his/her own with respect to the concerned course. 
+%% I have not provided this assignment to anyone (intentionally) who can potentially use it as his/her own with respect to the concerned course. 
 %% I understand that the Institute may take disciplinary action against me if there is a belief that this is not my own work.
 
 
