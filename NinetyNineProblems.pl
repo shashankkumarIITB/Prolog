@@ -171,6 +171,7 @@ combination(K, [_ | L], X) :- combination(K, L, X).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % P31: Check if the given number is prime
+:- table is_prime/1.
 is_prime(2) :- !.
 is_prime(N) :- N > 2, N mod 2 =\= 0, divisors(N, L), L == [1, N].
 % Find the divisors a given element.
@@ -215,6 +216,7 @@ swap([A, E], [E, A]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % P37: Euler's Phi function (improved version)
+:- table phi/2.
 phi(N, X) :- prime_factors_mult(N, L), phiHelper(X, L).
 phiHelper(1, []) :- !.
 phiHelper(N, [[A,E] | L]) :- phiHelper(N1, L), N is N1 * (A - 1) * (A ** (E - 1)).
@@ -227,6 +229,7 @@ prime_range(I, K, L) :- is_prime(I) -> I1 is I + 1, prime_range(I1, K, L1), appe
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % P40: Goldbach's conjecture
+:- table goldbach/2.
 goldbach(N, []) :- (N < 3 ; N mod 2 =\= 0), !.
 goldbach(N, L) :- goldbachHelper(N, L, 2).
 goldbachHelper(N, L, E) :- (K is N - E, is_prime(E), is_prime(K)) -> L = [E, K] ; E1 is E + 1, goldbachHelper(N, L, E1).  
@@ -244,6 +247,76 @@ goldbach_filter([], _, []).
 goldbach_filter([[N, A, B] | L1], J, L) :- (A >= J, B >= J) -> goldbach_filter(L1, J, L2), append([[N, A, B]], L2, L) ; goldbach_filter(L1, J, L). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% P46: Logical expressions (Version 1.0)
+% P46: Logical expressions (Version 1.0)	
+and(A, B) :- A, B.
+or(A, B) :- A; B.
+nand(A, B) :- not(and(A, B)).
+nor(A, B) :- not(or(A, B)).
+eql(A, B) :- A == B.
+impl(A, B) :- not(A); B.
+
+%% Table prints out truth values of the expression involving only 2 variables A and B
+
+table_helper(A,B) :- write(A), write(" "), write(B), write(" ").
+table(A, B, E) :- A = true, B = true, table_helper(A, B), (E -> write("true\n") ; write("false\n")).
+table(A, B, E) :- A = true, B = false, table_helper(A, B), (E -> write("true\n") ; write("false\n")).
+table(A, B, E) :- A = false, B = true, table_helper(A, B), (E -> write("true\n") ; write("false\n")).
+table(A, B, E) :- A = false, B = false, table_helper(A, B), (E -> write("true\n") ; write("false\n")).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P47: Logical expressions (Version 2.0)
+%% :- op(priority, evaluation type, identifier)
+:- op(100, xfy, or).
+:- op(100, xfy, nor).
+:- op(100, xfy, and).
+:- op(100, xfy, nand).
+:- op(100, xfy, impl).
+:- op(100, xfy, eql).
+
+%% Code for table remains same as above.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P48: Logical expressions (Version 3.0)
+table([], E) :- E -> write("true\n") ; write("false\n").
+table([A | L], E) :- A = true, table(L, E).
+table([A | L], E) :- A = false, table(L, E).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P49: Gray Code
+%% Memoization in Prolog
+%% The below command maintains a table of outputs for every query of gray/2
+:- table gray/2. 
+gray(1, ['0', '1']) :- !.
+gray(N, C) :- N1 is N - 1, gray(N1, C1), reverse(C1, C2), append_every('0', C1, C3), append_every('1', C2, C4), append(C3, C4, C).
+append_every(_, [], []) :- !.
+append_every(E, [A | L], X) :- append_every(E, L, X1), atom_concat(E, A, A1), append([A1], X1, X).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P50: Huffmann Encoding
+huffman([], []) :- !.
+huffman([[E, 0]], [[E]]) :- !.
+huffman([[E, _]], [[E, '']]) :- !.
+huffman(F, H) :- huffman_helper1(F, F1, A, A1, A2), huffman(F1, H1), huffman_helper2(A, A1, A2, H1, H).
+
+%% huffman_helper1 takes the frequency list F and returns modified frequency list F1 with two atoms of the least frequency concatenated
+huffman_helper1([], [], _, _, _) :- !.
+huffman_helper1(F, F1, A, A1, A2) :- huffmanSortList(F, F2), huffmanCombine(F2, F1, A, A1, A2).
+huffmanCombine([[E, F]], [[E, F]], E, E, '') :- !.
+huffmanCombine([[E1, F1], [E2, F2] | L], [[E3, F3] | L], E3, E1, E2) :- atom_concat(E1, E2, E3), F3 is F1 + F2.
+
+%% Sort a list of lists in the ascending order based on the second element of the sublist
+huffmanSortList([], []) :- !.
+huffmanSortList([A | L], X) :- huffmanSortList(L, X1), huffmanSortList_helper(A, X1, X).
+huffmanSortList_helper([K, E], [], [[K, E]]) :- !.
+huffmanSortList_helper([K, E], [[K1, E1] | L], X) :- E > E1 -> huffmanSortList_helper([K, E], L, X1), append([[K1, E1]], X1, X) ; append([[K, E]], [[K1, E1] | L], X).
+
+%% huffman_helper2 breaks the atoms combined by huffman_helper1 and assigns the corresponding huffman code
+huffman_helper2(_, _, _, [], []) :- !.
+huffman_helper2(A, A1, A2, [[A, E] | H1], H) :- atom_concat(E, '0', E1), atom_concat(E, '1', E2), append([[A1, E1]], H1, H2), append([[A2, E2]], H2, H), !.
+huffman_helper2(A, A1, A2, [[B, E] | H1], H) :- huffman_helper2(A, A1, A2, H1, H2), append([[B, E]], H2, H).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
