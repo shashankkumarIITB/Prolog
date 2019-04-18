@@ -1,0 +1,178 @@
+Programming Quiz 1
+Submission Instructions.
+Please read the following instructions before starting off with the quiz.
+
+There are 2 questions, one on Prolog and the other on ASP (using Clingo). You have to make one separate file for each of the two problems. For Problem 1 (Prolog), name the file p1.pl and for Problem 2 (ASP), name the file p2.lp. Put the 2 files in a folder named <roll_no> (eg. 1234567890). Finally, tar+gzip the folder and submit it. 
+
+You can use the  following command to tar+gzip your folder :
+tar -czvf <roll_no>.tar.gz <roll_no>
+
+You may not need the documentation, but if you want, you can download the docs which have been attached along. Also, please make sure to download the files at the beginning itself as the internet will be turned off after the first few minutes.
+
+In the Prolog question, some parameters are to be treated as inputs while the others are to be treated as variables, the values of which you will have to find. This will be clear from the sample test-cases given and you will not have to solve it for any other cases. For example, if in test cases, there is a function g(M, [1,2,3], N, 5), then you have to consider only the case in which M and N are not given and rest all the parameters are given.
+
+Do not worry about the time complexity of your solutions. The aim is to reach the correct solution. We will not test your code on large test cases, so you don't have to worry about time complexity. Just make sure that your code works on the given test cases and terminates in a reasonable amount of time (under ~10 seconds) on those inputs.
+
+Start both of your files with comments stating in your own words that you are not using any unfair practices in this exam and that you are writing all the code on your own without taking or giving help to any classmate. Sign by typing your name and roll number. You might lose marks for not writing these statements.
+
+Make sure to write all your code using exactly the same predicate names as given in the problems below.
+
+Now, you have the permission to start the quiz. Good Luck!
+
+Prolog Question [50 marks]
+Here are some useful built-in predicates which you may want to use. You are recommended to try them out first using swipl.
+
+?- sumlist([1,2,3], Ans).
+Ans = 6.
+
+
+?- maplist(plus,[1,2,3],[4,5,6],Ans).
+
+Ans = [5, 7, 9].
+
+
+
+Consider a square matrix M with n rows and n columns, containing any n2  integers. Note that integers need not be distinct. We call M a magic square with magic sum S if the integers in each of the n rows sum to S, the integers in each of the n columns also sum to S and the integers in both the principal diagonals also sum to S. Below are two simple examples of 3 x 3 magic squares with magic sums 15 and 0 respectively. Please note that S can be negative as well.
+
+             6  7   2                -1  -2   3   
+
+             1  5   9                 4   0   -4
+
+             8  3   4                 -3  2    1
+
+In Prolog, we can represent a n x n matrix as a list of n lists each with n integers. For example, the first matrix can be expressed as
+
+     M = [[6,7,2],[1,5,9],[8,3,4]]
+
+There are two main parts to this question. In the first part, you will only CHECK if a given matrix has some properties of a magic square. 
+
+You can assume these predicates will always be called with the first argument instantiated to a n x n  integer matrix. You don't need to check if the input is correct. Input will always have n lists each with n integers for n >= 1.
+
+1. [10 marks]
+
+Implement a predicate allRowsSameSum(Matrix, Sum) which succeeds only if all the rows have the same sum. In this case, it gives this Sum as output. Sample calls below.
+?- allRowsSameSum([[6,7,2],[1,9,5],[8,3,4]],Sum).
+Sum = 15.
+
+?- allRowsSameSum([[6,0,2,-4],[1,9,5,6],[8,7,3,4],[-6,3,0,-22]], Sum).
+false.
+
+2. [15 marks]
+
+Implement a predicate allColsSameSum(Matrix, Sum) which succeds only if all the columns have the same sum. In this case it gives this Sum as output.
+
+Hint:  Usually we do induction on lists by considering empty list  [] as the base case and non-empty list [F|R] with first element F.
+
+We can also use the base case as a singleton list [A] and inductive case as the list  [A | [B | R]]  with at least two elements A and B. Sample calls below.
+
+?- allColsSameSum([[6,7,2],[1,5,9],[8,3,4]],Sum).
+Sum = 15 .
+
+?- allColsSameSum([[6,0,2,-4],[1,9,5,6],[8,7,3,4],[-6,3,0,-22]], Sum).
+false.
+
+3.  [15 marks]
+
+Implement a predicate getDiagonals(Matrix, L, R)  which extracts the two principal diagonals from the matrix.
+
+?- getDiagonals([[6,7,2],[1,9,5],[8,3,4]], Left, Right).
+Left = [6, 9, 4],
+Right = [2, 9, 8].
+
+?- getDiagonals([[6,0,2,-4],[1,9,5,6],[8,7,3,4],[-6,3,0,-22]], Left, Right).
+Left = [6, 9, 3, -22],
+Right = [-4, 5, 7, -6].
+
+4. [10 marks]
+
+Implement a predicate checkMagic(Matrix, Sum) which when called with Matrix instantiated to a n x n  integer matrix succeeds (once) only if Matrix is a magic square and  Sum is the magic sum. It fails otherwise. See sample calls below.
+
+?- checkMagic([[1,1,1],[1,1,1],[1,1,1]],Sum).
+Sum = 3.
+
+?- checkMagic([[6,7,2],[1,9,5],[8,3,4]],Sum).
+false.
+
+
+
+ASP Question  (50 marks)
+
+
+Langford Sequence
+
+A Langford sequence is a permutation of the sequence of 2n numbers 1, 1, 2, 2, ..., n, n in which the two ones are one unit apart, the two twos are two units apart, and more generally the two copies of each number k are k units apart. Example for n=3: 2,3,1,2,1,3. (note that the reverse of any solution is also a solution. So, for n=3; 3,1,2,1,3,2 is also a solution, but we do not want both. So, we will choose the solution with the first number smaller than the last number). 
+
+
+
+Start with the following code and fill in as per the given hints.
+
+
+
+#const n = 4.  % pass n as command line argument...
+
+val(1..n). % the numbers 1..n to place.
+
+index(1..2*n). % the 2n positions in the sequence.
+
+
+
+% Use seq(i,j) to represent that at index i the number used is j.
+
+% For the example n=3:  2,3,1,2,1,3  seq(1,2), seq(2,3), and so on. The sample answers are as shown below.
+
+%% Hints for rest of code- 
+
+%%      (a) ensure each number is placed twice.
+
+%%      (b) for each number X, find its first position F
+
+%%      (c) from F ensure that moving X + 1 positions right also finds X.
+
+%%      (d) break symmetry by insisting that the first num is smaller than last.
+
+%%  Check your answer for n = 7 . For some values of n - e.g. n=6 there is no possible sequence.
+
+%%      you can implement any other way also.
+
+%%%%%%%%%%%%%%  Start your code here    %%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%          Code ends here          %%%%%%%%%%%%%%%
+
+#show seq/2.
+
+
+
+
+
+Sample Output
+clingo -c n=3 p2.lp
+
+Answer: 1
+
+seq(3,1) seq(5,1) seq(1,2) seq(4,2) seq(2,3) seq(6,3)
+
+SATISFIABLE
+
+Models       : 1
+
+
+
+clingo -c n=7 p2.lp
+
+Answer: 1
+
+seq(11,1) seq(13,1) seq(2,2) seq(5,2) seq(8,3) seq(12,3) seq(4,4) seq(9,4) seq(1,5) seq(7,5) seq(3,6) seq(10,6) seq(6,7) seq(14,7)
+
+SATISFIABLE
+
+Models       : 1+
+
+
+
+clingo -c n=2 p2.lp
+
+UNSATISFIABLE
+
+Models       : 0 
