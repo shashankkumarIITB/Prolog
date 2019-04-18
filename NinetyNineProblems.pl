@@ -316,7 +316,33 @@ huffman_helper2(A, A1, A2, [[A, E] | H1], H) :- atom_concat(E, '0', E1), atom_co
 huffman_helper2(A, A1, A2, [[B, E] | H1], H) :- huffman_helper2(A, A1, A2, H1, H2), append([[B, E]], H2, H).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P54: Check if the given pattern represents a binary tree
+istree(nil).
+istree(t(_, L, R)) :- istree(L), istree(R).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P55: Construct a completely balanced binary tree
+cbal_tree(0, nil) :- !.
+cbal_tree(N, t(x, L, R)) :- N0 is N - 1, N1 is N0 // 2, N2 is N0 - N1, distribute(N1, N2, NL, NR), cbal_tree(NL, L), cbal_tree(NR, R).
 
+distribute(N, N, N, N) :- !.
+distribute(N1, N2, N1, N2).
+distribute(N1, N2, N2, N1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P56: Check if the given binary tree is symmetric
+symmetric(nil) :- !.
+symmetric(t(_, L, R)) :- mirror(L, R).
+
+%% Check if the given trees are mirror images of each other
+mirror(nil, nil) :- !.
+mirror(nil, X) :- !, X == nil.
+mirror(nil, X) :- !, X == nil.
+mirror(t(_, L1, R1), t(_, L2, R2)) :- mirror(L1, R2), mirror(L2, R1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% P57: Construct binary search tree using the given list of integers
+construct([], nil) :- !.
+construct([A | L], T).
 
 
